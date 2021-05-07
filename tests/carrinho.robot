@@ -1,0 +1,63 @@
+* Settings *
+
+Resource      ${EXECDIR}/resources/base.robot
+
+Test Setup          Start Session
+Test Teardown       Take Screenshot
+
+* Test Cases *
+Deve adiciona um item ao carrinho
+
+    &{restaurant}   Create Dictionary   name=STARBUGS COFFEE    desc=Nada melhor que um café pra te ajudar a resolver um bug.
+
+    Go to restaurantes
+    Choose Restaurant     ${restaurant}
+    Add To Cart           Starbugs 500 error
+    Should Add To Cart    Starbugs 500 error
+    Total Cart Should Be  15,60
+
+
+Deve adicionar no carrinho
+    [Tags]    temp
+
+    &{restaurant}   Create Dictionary   name=STARBUGS COFFEE    desc=Nada melhor que um café pra te ajudar a resolver um bug.
+
+    Go to restaurantes
+    Choose Restaurant     ${restaurant}
+
+    # Add To Cart           Cappuccino com Chantilly
+    # Should Add To Cart    Cappuccino com Chantilly
+
+    # Add To Cart           Super Espreso
+    # Should Add To Cart    Super Espreso
+
+    # Add To Cart           Starbugs 500 error
+    # Should Add To Cart    Starbugs 500 error
+
+    Total Cart Should Be  38,00
+
+    Sleep     10
+
+* Keywords *
+Choose Restaurant
+    [Arguments]   ${restaurant}
+
+    Click     text=${restaurant["name"]}
+
+    Wait For Elements State     css=#detail   visible   10
+    Get Text      css=#detail    contains    ${restaurant["desc"]}
+
+Add To Cart
+    [Arguments]   ${name}
+
+    Click   xpath=//span[text()="${name}"]/..//a[@class="add-to-cart"]
+
+Should Add To Cart
+    [Arguments]     ${name}
+
+    Wait For Elements State     css=#cart tr >> text=${name}    visible   5
+
+Total Cart Should Be
+    [Arguments]   ${total}
+
+    Get Text      xpath=//th[contains(text(),"Total")]/..//td   contains    ${total}
